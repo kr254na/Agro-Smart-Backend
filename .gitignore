@@ -19,7 +19,6 @@ out/
 *.log
 logs/
 spring.log
-application.properties
 
 # =========================
 # Environment / Secrets
