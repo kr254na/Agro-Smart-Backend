@@ -1,0 +1,65 @@
+# =========================
+# Maven
+# =========================
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# =========================
+# IntelliJ IDEA
+# =========================
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# =========================
+# Spring Boot
+# =========================
+*.log
+logs/
+spring.log
+application.properties
+
+# =========================
+# Environment / Secrets
+# =========================
+.env
+application-local.properties
+application-dev.properties
+application-prod.properties
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# VS Code
+# =========================
+.vscode/
+
+# =========================
+# Build & Temp
+# =========================
+tmp/
+*.tmp
+*.bak
+*.swp
+
+# =========================
+# Test Reports
+# =========================
+surefire-reports/
+failsafe-reports/
+
+# =========================
+# Node (if frontend added later)
+# =========================
+node_modules/
+
+# =========================
+# Misc
+# =========================
+*.class
