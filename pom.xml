@@ -85,8 +85,7 @@
 		<!-- Source: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-mail -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-mail</artifactId>
-			<version>4.0.2</version>
+			<artifactId>spring-boot-starter-mail</artifactId>
 			<scope>compile</scope>
 		</dependency>
 		<!-- Source: https://mvnrepository.com/artifact/com.google.api-client/google-api-client -->

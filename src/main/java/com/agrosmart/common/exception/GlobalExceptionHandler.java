@@ -1,12 +1,18 @@
 package com.agrosmart.common.exception;
 
+import com.agrosmart.agromarket.exception.ProductNotFoundException;
+import com.agrosmart.common.dto.ApiResponse;
 import com.agrosmart.common.dto.ErrorResponse;
+import com.agrosmart.community.exception.CommentNotFoundException;
+import com.agrosmart.community.exception.PostNotFoundException;
 import com.agrosmart.farm.exception.FarmNotFoundException;
 import com.agrosmart.farm.exception.FieldNotFoundException;
 import com.agrosmart.identity.exception.*;
 import com.agrosmart.iot.exception.DeviceAlreadyRegisteredException;
 import com.agrosmart.iot.exception.DeviceNotFoundException;
 import com.agrosmart.iot.exception.NotificationNotFoundException;
+import org.apache.coyote.BadRequestException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -91,6 +97,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationMapping(org.springframework.web.bind.MethodArgumentNotValidException ex) {
         String errorMessage = ex.getBindingResult().getFieldError().getDefaultMessage();
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Validation Failed",
+                errorMessage,
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleValidationMapping(BadRequestException ex) {
+        String errorMessage = ex.getMessage();
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Validation Failed",
@@ -280,7 +298,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotificationNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotificationNotFound(NotificationNotFoundException ex) {
         String message = ex.getMessage();
-        HttpStatus status = HttpStatus.CONFLICT;
+        HttpStatus status = HttpStatus.NOT_FOUND;
         ErrorResponse errorResponse = new ErrorResponse(
                 status.value(),
                 "Notification Not Found",
@@ -288,6 +306,60 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
 
+        return new ResponseEntity<>(errorResponse, status);
+    }
+
+    @ExceptionHandler(PostNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePostNotFound(PostNotFoundException ex) {
+        String message = ex.getMessage();
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        ErrorResponse errorResponse = new ErrorResponse(
+                status.value(),
+                "Post Not Found",
+                message,
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(errorResponse, status);
+    }
+
+    @ExceptionHandler(CommentNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleCommentNotFound(CommentNotFoundException ex) {
+        String message = ex.getMessage();
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        ErrorResponse errorResponse = new ErrorResponse(
+                status.value(),
+                "Comment Not Found",
+                message,
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(errorResponse, status);
+    }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProductNotFound(ProductNotFoundException ex) {
+        String message = ex.getMessage();
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        ErrorResponse errorResponse = new ErrorResponse(
+                status.value(),
+                "Product Not Found",
+                message,
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(errorResponse, status);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrity(DataIntegrityViolationException ex) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorResponse errorResponse = new ErrorResponse(
+                status.value(),
+                "Constraint Violation",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
         return new ResponseEntity<>(errorResponse, status);
     }
 
