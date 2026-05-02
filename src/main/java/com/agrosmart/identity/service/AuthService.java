@@ -109,9 +109,9 @@ public class AuthService implements UserDetailsService
                     )
             );
             User user = userRepo.findByEmail(loginRequest.email()).orElse(null);
-            System.out.println(user);
+            System.out.println("User:"+user);
             String token = jwtService.generateToken(user.getEmail());
-            System.out.println(token);
+            System.out.println("Token:"+token);
             return LoginResponse.builder()
                     .email(user.getEmail())
                     .accessToken(token)
