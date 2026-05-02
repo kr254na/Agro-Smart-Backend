@@ -30,6 +30,7 @@ public class TelemetryController {
     public ResponseEntity<ApiResponse<List<DailyAverage>>> getSevenDayTrend(
             @PathVariable Long fieldId,
             @AuthenticationPrincipal UserDetails userDetails) {
+        System.out.println(telemetryService.getSevenDayHistory(fieldId, userDetails.getUsername()));
         return ResponseEntity.ok(ApiResponse.success("7-day trend data fetched",
                 telemetryService.getSevenDayHistory(fieldId, userDetails.getUsername())));
     }
