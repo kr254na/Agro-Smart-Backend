@@ -105,7 +105,7 @@ public class AuthService implements UserDetailsService
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.email(),
-                            passwordEncoder.encode(loginRequest.password())
+                            loginRequest.password()
                     )
             );
             User user = userRepo.findByEmail(loginRequest.email()).orElse(null);
