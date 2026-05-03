@@ -120,6 +120,7 @@ public class AuthService implements UserDetailsService
                     .build();
 
         } catch (AuthenticationException ex) {
+            System.out.println(ex.getMessage());
             throw new AuthenticationFailedException(
                     "Invalid username or password"
             );
