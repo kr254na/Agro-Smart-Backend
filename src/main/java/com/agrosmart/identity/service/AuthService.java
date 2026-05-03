@@ -109,9 +109,9 @@ public class AuthService implements UserDetailsService
                     )
             );
             User user = userRepo.findByEmail(loginRequest.email()).orElse(null);
-            System.out.println("User:"+user);
+
             String token = jwtService.generateToken(user.getEmail());
-            System.out.println("Token:"+token);
+
             return LoginResponse.builder()
                     .email(user.getEmail())
                     .accessToken(token)
@@ -120,7 +120,6 @@ public class AuthService implements UserDetailsService
                     .build();
 
         } catch (AuthenticationException ex) {
-            System.out.println(ex.getMessage());
             throw new AuthenticationFailedException(
                     "Invalid username or password"
             );
