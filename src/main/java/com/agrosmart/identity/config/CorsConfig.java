@@ -16,7 +16,7 @@ public class CorsConfig {
                 registry.addMapping("/**")
                         // Explicitly list your frontend URL instead of "*"
                         .allowedOrigins("http://localhost:5173", "http://localhost:3000",
-                                "https://agro-smart-frontend.vercel.app")
+                                "https://agrofy.vercel.app")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                         .allowedHeaders("*")
                         // Change to true to allow for secure cookie-based auth later
