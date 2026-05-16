@@ -2,6 +2,8 @@ package com.agrosmart.common.exception;
 
 import com.agrosmart.agromarket.exception.ProductNotFoundException;
 import com.agrosmart.common.dto.ApiResponse;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import org.springframework.validation.BindException;
 import com.agrosmart.common.dto.ErrorResponse;
 import com.agrosmart.community.exception.CommentNotFoundException;
 import com.agrosmart.community.exception.PostNotFoundException;
@@ -19,12 +21,19 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -94,13 +103,46 @@ public class GlobalExceptionHandler {
     }
 
     // Catch validation errors (e.g., if RegistrationRequest @Email fails)
-    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationMapping(org.springframework.web.bind.MethodArgumentNotValidException ex) {
-        String errorMessage = ex.getBindingResult().getFieldError().getDefaultMessage();
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationMapping(MethodArgumentNotValidException ex) {
+
+        FieldError categoryError = ex.getBindingResult().getFieldError("category");
+        Throwable rootCause = ex;
+        while (rootCause.getCause() != null) {
+            rootCause = rootCause.getCause();
+        }
+
+        if (categoryError != null && rootCause instanceof InvalidFormatException) {
+            InvalidFormatException ife =
+                    (InvalidFormatException) rootCause;
+
+            String rejectedValue = ife.getValue().toString();
+            String customMessage = String.format(
+                    "Invalid category '%s' ", rejectedValue
+            );
+
+            ErrorResponse error = new ErrorResponse(
+                    HttpStatus.BAD_REQUEST.value(),
+                    "Invalid Enum Value",
+                    customMessage,
+                    LocalDateTime.now()
+            );
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+
+        List<FieldError> sortedErrors = ex.getBindingResult().getFieldErrors().stream()
+                .sorted(Comparator.comparing(FieldError::getField))
+                .collect(Collectors.toList());
+
+        String targetedMessage = "Validation Failed";
+        if (!sortedErrors.isEmpty()) {
+            targetedMessage = sortedErrors.get(0).getDefaultMessage();
+        }
+
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Validation Failed",
-                errorMessage,
+                targetedMessage,
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
@@ -358,6 +400,20 @@ public class GlobalExceptionHandler {
                 status.value(),
                 "Constraint Violation",
                 ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, status);
+    }
+
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxSizeException(
+            MaxUploadSizeExceededException exc) {
+        HttpStatus status = HttpStatus.PAYLOAD_TOO_LARGE;
+        ErrorResponse errorResponse = new ErrorResponse(
+                status.value(),
+                "Invalid File Configuration",
+                "File configuration limit exceeded! Maximum allowed size is 5MB.",
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(errorResponse, status);
