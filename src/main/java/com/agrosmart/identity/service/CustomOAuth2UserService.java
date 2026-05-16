@@ -96,10 +96,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .enabled(true)
                 .build();
 
+        String googleProfilePic = (String) payload.get("picture");
+
         FarmerProfile profile = FarmerProfile.builder()
                 .user(user)
                 .firstName((String) payload.get("given_name"))
                 .lastName((String) payload.get("family_name"))
+                .profilePicUrl(googleProfilePic)
                 .address(new Address())
                 .build();
         user.setProfile(profile);
@@ -114,10 +117,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .enabled(true)
                 .build();
 
+        String googleProfilePic = oAuth2User.getAttribute("picture");
+
         FarmerProfile profile = FarmerProfile.builder()
                 .user(user)
                 .firstName(oAuth2User.getAttribute("given_name"))
                 .lastName(oAuth2User.getAttribute("family_name"))
+                .profilePicUrl(googleProfilePic)
                 .address(new Address())
                 .build();
 

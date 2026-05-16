@@ -1,5 +1,6 @@
 package com.agrosmart.identity.service;
 
+import com.agrosmart.common.service.CloudinaryService;
 import com.agrosmart.identity.dto.LoginRequest;
 import com.agrosmart.identity.dto.LoginResponse;
 import com.agrosmart.identity.dto.RegistrationRequest;
@@ -33,6 +34,7 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import com.agrosmart.identity.exception.EmailSendingException;
 import com.agrosmart.identity.exception.InvalidOtpException;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class AuthService implements UserDetailsService
@@ -54,6 +56,8 @@ public class AuthService implements UserDetailsService
     private RefreshTokenService refreshTokenService;
     @Autowired
     private JavaMailSender mailSender;
+    @Autowired
+    private CloudinaryService cloudinaryService;
     @Override
     public UserDetails loadUserByUsername(String email) {
         User user = userRepo.findByEmail(email).orElse(null);
@@ -93,6 +97,18 @@ public class AuthService implements UserDetailsService
                 .phoneNumber(request.getPhoneNumber())
                 .address(address)
                 .build();
+
+        MultipartFile profilePic = request.getProfilePic();
+        if (profilePic != null && !profilePic.isEmpty()) {
+            String contentType = profilePic.getContentType();
+
+            if (contentType == null || !contentType.startsWith("image/")) {
+                throw new AuthenticationFailedException("Only image files are allowed for profile pictures.");
+            }
+
+            String uploadedImageUrl = cloudinaryService.uploadImage(profilePic, "identity/profiles", "identity","profile-pic");
+            profile.setProfilePicUrl(uploadedImageUrl);
+        }
 
         user.setProfile(profile);
         userRepo.save(user);

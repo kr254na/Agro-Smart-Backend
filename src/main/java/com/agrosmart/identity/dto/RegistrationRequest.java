@@ -3,6 +3,7 @@ package com.agrosmart.identity.dto;
 import com.agrosmart.identity.enums.Role;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder
@@ -27,4 +28,5 @@ public class RegistrationRequest {
         private String district;
         @NotBlank @Pattern(regexp = "^[1-9][0-9]{5}$")
         private String pincode;
+        private MultipartFile profilePic;
 }

@@ -19,8 +19,8 @@ public class AuthController {
     private final AuthService authService;
     private final CustomOAuth2UserService oauth2Service;
 
-    @PostMapping("/register")
-    public ResponseEntity<ApiResponse<String>> register(@Valid @RequestBody RegistrationRequest request) {
+    @PostMapping(value = "/register", consumes = {"multipart/form-data"})
+    public ResponseEntity<ApiResponse<String>> register(@Valid @ModelAttribute RegistrationRequest request) {
         String message = authService.registerUser(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse<>(true,"Registration Successful", message, LocalDateTime.now()));

@@ -2,6 +2,7 @@ package com.agrosmart.identity.dto;
 
 import lombok.Data;
 import jakarta.validation.constraints.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class ProfileUpdateRequest {
@@ -14,4 +15,6 @@ public class ProfileUpdateRequest {
     private String district;
     @Pattern(regexp = "^[1-9][0-9]{5}$")
     private String pincode;
+    private MultipartFile profilePic;
+    private boolean removeImage=false;
 }

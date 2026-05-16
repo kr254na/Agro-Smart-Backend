@@ -1,5 +1,6 @@
 package com.agrosmart.identity.service;
 
+import com.agrosmart.common.service.CloudinaryService;
 import com.agrosmart.identity.dto.ChangePasswordRequest;
 import com.agrosmart.identity.dto.ProfileUpdateRequest;
 import com.agrosmart.identity.exception.AuthenticationFailedException;
@@ -13,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 @Service
@@ -22,6 +25,7 @@ public class UserService {
     private final UserRepo userRepo;
     private final FarmerProfileRepo farmerProfileRepo;
     private final PasswordEncoder passwordEncoder;
+    private final CloudinaryService cloudinaryService;
 
     public FarmerProfile getProfileByEmail(String email) {
         User user = userRepo.findByEmail(email)
@@ -47,6 +51,28 @@ public class UserService {
         if (dto.getDistrict() != null) addr.setDistrict(dto.getDistrict());
         if (dto.getPincode() != null) addr.setPincode(dto.getPincode());
 
+        MultipartFile profilePic = dto.getProfilePic();
+        if (dto.isRemoveImage()) {
+            if (profile.getProfilePicUrl() != null) {
+                cloudinaryService.deleteImage(profile.getProfilePicUrl());
+            }
+            profile.setProfilePicUrl(null);
+        }
+        else if (profilePic != null && !profilePic.isEmpty()) {
+            String contentType = profilePic.getContentType();
+
+            if (contentType == null || !contentType.startsWith("image/")) {
+                throw new IllegalArgumentException("Only image files are allowed for profile pictures.");
+            }
+
+            if (profile.getProfilePicUrl() != null) {
+                cloudinaryService.deleteImage(profile.getProfilePicUrl());
+            }
+
+            String newImageUrl = cloudinaryService.uploadImage(profilePic, "identity/profiles", "identity","profile-pic");
+            profile.setProfilePicUrl(newImageUrl);
+        }
+
         return farmerProfileRepo.save(profile);
     }
 
@@ -58,6 +84,9 @@ public class UserService {
     public void deleteUser(String email) {
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
+        if (user.getProfile().getProfilePicUrl() != null) {
+            cloudinaryService.deleteImage(user.getProfile().getProfilePicUrl());
+        }
         userRepo.delete(user);
     }
 

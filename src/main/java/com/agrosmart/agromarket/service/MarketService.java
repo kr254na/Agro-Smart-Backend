@@ -133,6 +133,10 @@ public class MarketService {
             product.setImageUrl(null);
         }
         else if (imageFile != null && !imageFile.isEmpty()) {
+            String contentType = imageFile.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                throw new BadRequestException("Only image files are allowed.");
+            }
             cloudinaryService.deleteImage(product.getImageUrl());
                 String newImageUrl = cloudinaryService.uploadImage(imageFile,"agromarket/products","agromarket","product");
                 product.setImageUrl(newImageUrl);

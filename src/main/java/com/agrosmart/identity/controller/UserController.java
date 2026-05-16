@@ -33,10 +33,10 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success("All farmers fetched", userService.getAllFarmers()));
     }
 
-    @PutMapping("/me")
+    @PutMapping(value = "/me", consumes = {"multipart/form-data"})
     public ResponseEntity<ApiResponse<FarmerProfile>> updateMyProfile(
             @AuthenticationPrincipal UserDetails userDetails,
-            @Valid @RequestBody ProfileUpdateRequest request) {
+            @Valid @ModelAttribute ProfileUpdateRequest request) {
         FarmerProfile updated = userService.updateProfile(userDetails.getUsername(), request);
         return ResponseEntity.ok(ApiResponse.success("Profile updated", updated));
     }

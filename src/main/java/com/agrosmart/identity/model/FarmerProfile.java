@@ -40,4 +40,6 @@ public class FarmerProfile {
     @Embedded
     @Valid
     private Address address;
+
+    private String profilePicUrl;
 }
