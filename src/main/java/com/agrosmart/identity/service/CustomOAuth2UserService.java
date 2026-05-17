@@ -60,6 +60,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         );
     }
 
+    @Transactional
     public LoginResponse processGoogleUser(String idTokenString) {
         GoogleIdToken idToken =  verifyGoogleToken(idTokenString);
         GoogleIdToken.Payload payload = idToken.getPayload();
