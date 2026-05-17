@@ -12,7 +12,12 @@ import org.springframework.web.multipart.MultipartFile;
 public class RegistrationRequest {
         @NotBlank @Email
         private String email;
-        @NotBlank @Size(min = 8)
+        @NotBlank(message = "Password is required")
+        @Size(min = 8, message = "Password must be at least 8 characters long")
+        @Pattern(
+                regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$",
+                message = "Password must contain at least one digit, one lowercase, one uppercase, and one special character"
+        )
         private String password;
         private Role role;
         @NotBlank
