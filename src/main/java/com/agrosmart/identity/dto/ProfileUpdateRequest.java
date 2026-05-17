@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ProfileUpdateRequest {
     private String firstName;
     private String lastName;
-    @Pattern(regexp = "^[6-9]\\d{9}$")
+    @Pattern(regexp = "^$|^[6-9]\\d{9}$", message = "Invalid Indian mobile number format")
     private String phoneNumber;
     private String city;
     private String state;

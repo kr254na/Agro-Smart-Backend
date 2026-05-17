@@ -18,7 +18,7 @@ public class RegistrationRequest {
         @NotBlank
         private String firstName;
         private String lastName;
-        @NotBlank @Pattern(regexp = "^[6-9]\\d{9}$")
+        @Pattern(regexp = "^$|^[6-9]\\d{9}$", message = "Invalid Indian mobile number format")
         private String phoneNumber;
         @NotBlank
         private String city;
