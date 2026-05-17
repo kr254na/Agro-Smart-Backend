@@ -32,9 +32,8 @@ public class FarmerProfile {
 
     private String lastName;
 
-    @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^[6-9]\\d{9}$", message = "Invalid Indian mobile number")
-    @Column(unique = true)
+    @Pattern(regexp = "^$|^[6-9]\\d{9}$", message = "Invalid Indian mobile number")
+    @Column(name = "phone_number", unique = true, nullable = true)
     private String phoneNumber;
 
     @Embedded
