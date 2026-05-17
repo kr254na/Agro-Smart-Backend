@@ -114,6 +114,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         String googleProfilePic = (String) payload.get("picture");
 
+        Address address = Address.builder()
+                .city("Lucknow")
+                .district("Lucknow")
+                .state("Uttar Pradesh")
+                .pincode("226001")
+                .build();
+
         FarmerProfile profile = FarmerProfile.builder()
                 .user(user)
                 .firstName(
@@ -125,7 +132,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                                 .orElse("")
                 )
                 .profilePicUrl(googleProfilePic)
-                .address(Address.builder().build())
+                .address(address)
                 .build();
         user.setProfile(profile);
         return userRepo.save(user);
@@ -141,6 +148,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         String googleProfilePic = oAuth2User.getAttribute("picture");
 
+        Address address = Address.builder()
+                .city("Lucknow")
+                .district("Lucknow")
+                .state("Uttar Pradesh")
+                .pincode("226001")
+                .build();
+
         FarmerProfile profile = FarmerProfile.builder()
                 .user(user)
                 .firstName(
@@ -152,7 +166,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                                 .orElse("")
                 )
                 .profilePicUrl(googleProfilePic)
-                .address(Address.builder().build())
+                .address(address)
                 .build();
 
         user.setProfile(profile);
