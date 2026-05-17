@@ -17,6 +17,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -25,6 +26,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
@@ -33,6 +36,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private UserRepo userRepo;
     @Autowired
     private JwtService jwtService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String clientId;
     @Override
@@ -89,9 +94,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private User registerNewOAuthUserFromPayload(GoogleIdToken.Payload payload) {
+        Boolean emailVerified = payload.getEmailVerified();
+
+        if (emailVerified == null || !emailVerified) {
+            throw new AuthenticationFailedException("Google email not verified");
+        }
+
         User user = User.builder()
                 .email(payload.getEmail())
-                .password(null)
+                .password(passwordEncoder.encode(UUID.randomUUID().toString()))
                 .role(Role.ROLE_USER)
                 .enabled(true)
                 .build();
@@ -100,10 +111,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         FarmerProfile profile = FarmerProfile.builder()
                 .user(user)
-                .firstName((String) payload.get("given_name"))
-                .lastName((String) payload.get("family_name"))
+                .firstName(
+                        Optional.ofNullable((String) payload.get("given_name"))
+                                .orElse("User")
+                )
+                .lastName(
+                        Optional.ofNullable((String) payload.get("family_name"))
+                                .orElse("")
+                )
                 .profilePicUrl(googleProfilePic)
-                .address(new Address())
+                .address(Address.builder().build())
                 .build();
         user.setProfile(profile);
         return userRepo.save(user);
