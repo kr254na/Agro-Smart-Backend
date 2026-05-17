@@ -8,6 +8,7 @@ import com.agrosmart.identity.model.Address;
 import com.agrosmart.identity.model.FarmerProfile;
 import com.agrosmart.identity.model.User;
 import com.agrosmart.identity.repository.UserRepo;
+import com.fasterxml.jackson.annotation.JacksonInject;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -17,6 +18,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -36,7 +38,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepo userRepo;
     private final JwtService jwtService;
-    private final PasswordEncoder passwordEncoder;
+    @JacksonInject
+    @Autowired
+    @Lazy
+    private PasswordEncoder passwordEncoder;
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String clientId;
     @Override
@@ -128,7 +133,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private User registerNewOAuthUser(OAuth2User oAuth2User, String email) {
         User user = User.builder()
                 .email(email)
-                .password(null)
+                .password(passwordEncoder.encode(UUID.randomUUID().toString()))
                 .role(Role.ROLE_USER)
                 .enabled(true)
                 .build();
@@ -137,10 +142,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         FarmerProfile profile = FarmerProfile.builder()
                 .user(user)
-                .firstName(oAuth2User.getAttribute("given_name"))
-                .lastName(oAuth2User.getAttribute("family_name"))
+                .firstName(
+                        Optional.ofNullable((String) oAuth2User.getAttribute("given_name"))
+                                .orElse("User")
+                )
+                .lastName(
+                        Optional.ofNullable((String) oAuth2User.getAttribute("family_name"))
+                                .orElse("")
+                )
                 .profilePicUrl(googleProfilePic)
-                .address(new Address())
+                .address(Address.builder().build())
                 .build();
 
         user.setProfile(profile);
