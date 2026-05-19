@@ -172,7 +172,7 @@ public class AuthService implements UserDetailsService
                 throw new UserNotFoundException("User with this email id does not exists");
             }
             MimeMessage message = mailSender.createMimeMessage();
-            message.setFrom(new InternetAddress("no-reply@agrosmart.com", "Agro Smart Support"));
+            message.setFrom(new InternetAddress("agrosmart254@gmail.com", "Agro Smart Support"));
             message.setRecipients(MimeMessage.RecipientType.TO, email);
             message.setSubject("Password Reset OTP - Agro Smart");
             String htmlContent = "<h3>Hello "+user.getProfile().getFirstName()+",</h3>" +
