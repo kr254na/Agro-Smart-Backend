@@ -165,7 +165,7 @@ public class AuthService implements UserDetailsService
     }
 
     @Async
-    private void sendOtpEmail(String email, String otp) {
+    public void sendOtpEmail(String email, String otp) {
         try {
             User user = userRepo.findByEmail(email).orElse(null);
             if(user == null){
