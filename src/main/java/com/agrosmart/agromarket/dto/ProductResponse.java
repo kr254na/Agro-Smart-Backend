@@ -18,6 +18,7 @@ public class ProductResponse {
     private ProductCategory category;
     private String imageUrl;
     private String sellerName;
+    private String sellerEmail;
     private String sellerContact;
     private boolean isSold;
     private LocalDateTime createdAt;

@@ -27,6 +27,12 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success("Profile fetched", profile));
     }
 
+    @GetMapping("/profile/{email}")
+    public ResponseEntity<ApiResponse<FarmerProfile>> getFarmerProfile(@PathVariable String email) {
+        FarmerProfile profile = userService.getProfileByEmail(email);
+        return ResponseEntity.ok(ApiResponse.success("Profile fetched", profile));
+    }
+
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<FarmerProfile>>> getAllFarmers() {

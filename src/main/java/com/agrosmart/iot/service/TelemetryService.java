@@ -63,7 +63,8 @@ public class TelemetryService {
 
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 5000)
+    @Transactional
     public void fetchFromThingSpeak() {
         String url = "https://api.thingspeak.com/channels/3257222/feeds.json?api_key="
                 + hardwareApiKey.trim() + "&results=1";
@@ -73,7 +74,7 @@ public class TelemetryService {
             if (response != null && !response.getFeeds().isEmpty()) {
                 ThingSpeakFeed feed = response.getFeeds().get(0);
 
-                Long fieldId = Long.parseLong(feed.getNodeId());
+                Long fieldId = Long.parseLong(feed.getNodeId().trim());
                 List<SensorDevice> device = deviceRepo.findByFieldId(fieldId);
 
                 TelemetryRequest request = new TelemetryRequest();

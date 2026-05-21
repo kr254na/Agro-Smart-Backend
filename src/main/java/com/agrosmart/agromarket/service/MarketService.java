@@ -186,6 +186,7 @@ public class MarketService {
                 .sellerName(product.getSeller().getProfile().getFirstName() + " " +
                         product.getSeller().getProfile().getLastName())
                 .sellerContact(product.getSeller().getProfile().getPhoneNumber())
+                .sellerEmail(product.getSeller().getEmail())
                 .build();
     }
 }

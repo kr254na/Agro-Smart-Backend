@@ -182,7 +182,6 @@ public class AuthService implements UserDetailsService
             message.setContent(htmlContent, "text/html; charset=utf-8");
             mailSender.send(message);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new EmailSendingException("Failed to send email! Please try again later");
         }
     }
